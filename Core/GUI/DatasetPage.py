@@ -4,7 +4,7 @@ import pandas as pd
 from pandastable import Table
 from tkinter.scrolledtext import ScrolledText
 
-class DataAnalysisApp:
+class Dataset:
     def __init__(self, root):
         self.root = root
         self.root.title("Data Analysis Tool")
@@ -253,5 +253,5 @@ class DataAnalysisApp:
 # Main application
 if __name__ == "__main__":
     root = tk.Tk()
-    app = DataAnalysisApp(root)
+    app = Dataset(root)
     root.mainloop()
