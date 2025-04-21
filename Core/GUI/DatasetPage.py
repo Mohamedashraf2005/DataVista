@@ -1,257 +1,155 @@
-import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
+import customtkinter as ctk
+from tkinter import filedialog, messagebox
+from tkinter import ttk
 import pandas as pd
-from pandastable import Table
-from tkinter.scrolledtext import ScrolledText
 
-class Dataset:
+ctk.set_appearance_mode("light")
+ctk.set_default_color_theme("blue")
+
+class DatasetApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Data Analysis Tool")
-        self.root.geometry("1600x1200")
-        self.root.configure(bg="white")
-        
-        # Initialize data variables
-        self.df = None
-        self.file_path = ""
-        self.dataset_name = "No dataset loaded"  # Initialize here before use
-        
-        # Create notebook for tabs
-        self.notebook = ttk.Notebook(root)
-        self.notebook.pack(fill='both', expand=True)
-        
-        # Create tabs
-        self.create_dataset_tab()
-        self.create_eda_tab()
-        self.create_ml_tab()
-        self.create_about_tab()
-        
-    def create_dataset_tab(self):
-        # Dataset tab
-        self.dataset_tab = ttk.Frame(self.notebook)
-        self.notebook.add(self.dataset_tab, text="DataSet")
-        
-        # Left panel - Data display and filters
-        left_panel = ttk.Frame(self.dataset_tab)
-        left_panel.pack(side='left', fill='both', expand=True, padx=10, pady=10)
-        
-        # Dataset name
-        self.dataset_name_label = ttk.Label(left_panel, text=self.dataset_name, font=('Segoe UI', 14))
-        self.dataset_name_label.pack(anchor='w', pady=(10, 5))
-        
-        # Scrollable data display
-        self.data_frame = ttk.Frame(left_panel)
-        self.data_frame.pack(fill='both', expand=True)
-        
-        # Filter options
-        filter_frame = ttk.Frame(left_panel)
-        filter_frame.pack(fill='x', pady=10)
-        
-        ttk.Label(filter_frame, text="Choose and apply filter to columns").pack(side='left', padx=5)
-        self.filter_options = ttk.Combobox(filter_frame, values=["No filter", "Numeric only", "Categorical only"])
-        self.filter_options.pack(side='left', padx=5)
-        self.filter_options.set("No filter")
-        
-        # Right panel - Dataset summary
-        right_panel = ttk.Frame(self.dataset_tab)
-        right_panel.pack(side='right', fill='both', expand=True, padx=10, pady=10)
-        
-        # Summary sections
-        self.summary_labels = {}
-        summary_sections = [
-            "Overview", "Shape", "Missing Values", 
-            "Duplicates", "Data Types", "Stats", 
-            "Unique Values", "Critical Columns"
-        ]
-        
-        for section in summary_sections:
-            section_frame = ttk.LabelFrame(right_panel, text=section)
-            section_frame.pack(fill='x', pady=5)
-            self.summary_labels[section] = ttk.Label(section_frame, text="Not available", wraplength=300)
-            self.summary_labels[section].pack(anchor='w', padx=5, pady=2)
-        
-        # Load data button
-        load_btn = ttk.Button(self.dataset_tab, text="Load Dataset", command=self.load_dataset)
-        load_btn.pack(side='bottom', pady=10)
-    
-    def create_eda_tab(self):
-        # EDA tab
-        self.eda_tab = ttk.Frame(self.notebook)
-        self.notebook.add(self.eda_tab, text="EDA")
-        
-        # Placeholder content
-        ttk.Label(self.eda_tab, text="Exploratory Data Analysis Tools", font=('Segoe UI', 16)).pack(pady=20)
-        
-        # Visualization options
-        viz_frame = ttk.Frame(self.eda_tab)
-        viz_frame.pack(fill='both', expand=True, padx=20, pady=10)
-        
-        viz_options = ["Histogram", "Box Plot", "Scatter Plot", "Correlation Matrix", "Pair Plot"]
-        for i, option in enumerate(viz_options):
-            btn = ttk.Button(viz_frame, text=option)
-            btn.grid(row=i//3, column=i%3, padx=10, pady=10, sticky='nsew')
-            viz_frame.grid_columnconfigure(i%3, weight=1)
-        
-        # Output area
-        self.eda_output = ScrolledText(self.eda_tab, height=10)
-        self.eda_output.pack(fill='both', expand=True, padx=20, pady=10)
-    
-    def create_ml_tab(self):
-        # ML Model tab
-        self.ml_tab = ttk.Frame(self.notebook)
-        self.notebook.add(self.ml_tab, text="ML Model")
-        
-        # Model selection
-        ttk.Label(self.ml_tab, text="Machine Learning Model Training", font=('Segoe UI', 16)).pack(pady=20)
-        
-        model_frame = ttk.Frame(self.ml_tab)
-        model_frame.pack(fill='x', padx=20, pady=10)
-        
-        ttk.Label(model_frame, text="Select Model:").pack(side='left', padx=5)
-        self.model_selector = ttk.Combobox(model_frame, values=[
-            "Linear Regression", "Logistic Regression", "Decision Tree", 
-            "Random Forest", "SVM", "Neural Network"
-        ])
-        self.model_selector.pack(side='left', padx=5, fill='x', expand=True)
-        
-        # Feature/target selection
-        feature_frame = ttk.Frame(self.ml_tab)
-        feature_frame.pack(fill='x', padx=20, pady=10)
-        
-        ttk.Label(feature_frame, text="Features:").pack(side='left', padx=5)
-        self.feature_selector = tk.Listbox(feature_frame, selectmode='multiple', height=4)
-        self.feature_selector.pack(side='left', padx=5, fill='x', expand=True)
-        
-        ttk.Label(feature_frame, text="Target:").pack(side='left', padx=5)
-        self.target_selector = ttk.Combobox(feature_frame)
-        self.target_selector.pack(side='left', padx=5, fill='x', expand=True)
-        
-        # Train button
-        train_btn = ttk.Button(self.ml_tab, text="Train Model")
-        train_btn.pack(pady=10)
-        
-        # Results area
-        self.ml_output = ScrolledText(self.ml_tab, height=10)
-        self.ml_output.pack(fill='both', expand=True, padx=20, pady=10)
-    
-    def create_about_tab(self):
-        # About tab (optional)
-        self.about_tab = ttk.Frame(self.notebook)
-        self.notebook.add(self.about_tab, text="About Project")
-        
-        # Project information
-        ttk.Label(self.about_tab, text="About This Project", font=('Segoe UI', 16)).pack(pady=20)
-        
-        about_text = """
-       DA project
-        """
-        
-        ttk.Label(self.about_tab, text=about_text, justify='left').pack(pady=10, padx=20)
-    
-    def load_dataset(self):
-        # Open file dialog to select dataset
-        self.file_path = filedialog.askopenfilename(
-            filetypes=[("CSV Files", "*.csv"), ("Excel Files", "*.xlsx"), ("All Files", "*.*")]
-        )
-        
-        if not self.file_path:
-            return
-            
-        try:
-            # Extract dataset name from file path
-            self.dataset_name = self.file_path.split("/")[-1].split(".")[0]
-            self.dataset_name_label.config(text=self.dataset_name)
-            
-            if self.file_path.endswith('.csv'):
-                self.df = pd.read_csv(self.file_path)
-            elif self.file_path.endswith('.xlsx'):
-                self.df = pd.read_excel(self.file_path)
-            
-            # Display data and update summaries
-            self.display_data()
-            self.update_summary()
-            self.update_ml_selectors()
-            
-            messagebox.showinfo("Success", "Dataset loaded successfully!")
-            
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to load dataset: {str(e)}")
-    
-    def display_data(self):
-        # Clear previous data display
-        for widget in self.data_frame.winfo_children():
-            widget.destroy()
-        
-        # Create a pandastable to display the dataframe
-        pt = Table(self.data_frame, dataframe=self.df.head(100), showtoolbar=True, showstatusbar=True)
-        pt.show()
-    
-    def update_summary(self):
-        """Update all summary information in the dataset tab"""
-        if self.df is not None:
-            # Overview
-            self.summary_labels["Overview"].config(text=f"Source: {self.file_path}")
-            
-            # Shape
-            self.summary_labels["Shape"].config(text=f"Rows: {self.df.shape[0]}, Columns: {self.df.shape[1]}")
-            
-            # Missing Values
-            null_counts = self.df.isnull().sum()
-            null_pct = (null_counts / len(self.df)) * 100
-            missing_text = "\n".join([f"{col}: {null_counts[col]} ({null_pct[col]:.1f}%)" 
-                                     for col in null_counts[null_counts > 0].index])
-            self.summary_labels["Missing Values"].config(text=missing_text or "No missing values")
-            
-            # Duplicates
-            dupes = self.df.duplicated().sum()
-            self.summary_labels["Duplicates"].config(text=f"Total duplicated rows: {dupes}")
-            
-            # Data Types
-            dtypes = self.df.dtypes.astype(str)
-            dtype_text = "\n".join([f"{col}: {dtypes[col]}" for col in dtypes.index])
-            self.summary_labels["Data Types"].config(text=dtype_text)
-            
-            # Stats (for numerical columns)
-            num_cols = self.df.select_dtypes(include=['number']).columns
-            if not num_cols.empty:
-                stats = self.df[num_cols].describe().transpose()
-                stats_text = "\n".join([
-                    f"{col}: mean={stats.loc[col, 'mean']:.2f}, median={stats.loc[col, '50%']:.2f}, "
-                    f"std={stats.loc[col, 'std']:.2f}, min={stats.loc[col, 'min']:.2f}, "
-                    f"max={stats.loc[col, 'max']:.2f}"
-                    for col in stats.index
-                ])
-                self.summary_labels["Stats"].config(text=stats_text)
-            else:
-                self.summary_labels["Stats"].config(text="No numerical columns")
-            
-            # Unique Values (for categorical columns)
-            cat_cols = self.df.select_dtypes(include=['object', 'category']).columns
-            if not cat_cols.empty:
-                unique_text = "\n".join([f"{col}: {self.df[col].nunique()} unique values" 
-                                       for col in cat_cols])
-                self.summary_labels["Unique Values"].config(text=unique_text)
-            else:
-                self.summary_labels["Unique Values"].config(text="No categorical columns")
-            
-            # Critical Columns
-            high_missing = null_pct[null_pct > 30].index.tolist()
-            critical_text = "High missing values (>30%): " + (", ".join(high_missing) if high_missing else "None")
-            self.summary_labels["Critical Columns"].config(text=critical_text)
-    
-    def update_ml_selectors(self):
-        # Update feature and target selectors in ML tab
-        self.feature_selector.delete(0, tk.END)
-        self.target_selector['values'] = []
-        
-        if self.df is not None:
-            for col in self.df.columns:
-                self.feature_selector.insert(tk.END, col)
-            
-            self.target_selector['values'] = list(self.df.columns)
+        self.root.title("Dataset Interface")
+        self.root.geometry("1200x640")
+        self.root.resizable(False, False)
 
-# Main application
+        self.df = None
+        self.summary_labels = {}
+
+        self.create_top_frame()
+        self.create_main_frame()
+
+    def create_top_frame(self):
+        self.top_frame = ctk.CTkFrame(self.root, fg_color="#f0f4f8")
+        self.top_frame.pack(side=ctk.TOP, fill=ctk.X, padx=5, pady=5)
+
+        self.btn_dataset = ctk.CTkButton(self.top_frame, text="DataSet", fg_color="#1a73e8", text_color="white", font=("Arial", 15, "bold"), corner_radius=10, command=self.load_dataset)
+        self.btn_dataset.pack(side=ctk.LEFT, padx=10, expand=True, fill=ctk.X)
+
+        self.btn_eda = ctk.CTkButton(self.top_frame, text="EDA", fg_color="#e8f0fe", text_color="#1a73e8", font=("Arial", 15), corner_radius=10, command=self.show_eda)
+        self.btn_eda.pack(side=ctk.LEFT, padx=10, expand=True, fill=ctk.X)
+
+        self.btn_ml = ctk.CTkButton(self.top_frame, text="ML Model", fg_color="#e8f0fe", text_color="#1a73e8", font=("Arial", 15), corner_radius=10)
+        self.btn_ml.pack(side=ctk.LEFT, padx=10, expand=True, fill=ctk.X)
+
+        self.btn_about = ctk.CTkButton(self.top_frame, text="About Project (optional)", fg_color="#e8f0fe", text_color="#1a73e8", font=("Arial", 15), corner_radius=10)
+        self.btn_about.pack(side=ctk.LEFT, padx=10, expand=True, fill=ctk.X)
+
+    def create_main_frame(self):
+        self.main_frame = ctk.CTkFrame(self.root, fg_color="#f0f4f8")
+        self.main_frame.pack(fill=ctk.BOTH, expand=True, padx=10, pady=10)
+        self.main_frame.pack_propagate(False)
+
+        self.create_left_frame()
+        self.create_right_frame()
+
+    def create_left_frame(self):
+        self.left_frame = ctk.CTkFrame(self.main_frame, fg_color="#ffffff", corner_radius=10, width=int(1024 * 0.75))
+        self.left_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=False, padx=5, pady=5)
+        self.left_frame.pack_propagate(False)
+
+        self.label_dataset_name = ctk.CTkLabel(self.left_frame, text="Name of the DataSet", fg_color="#ffffff", font=("Arial", 15, "bold"))
+        self.label_dataset_name.pack(anchor="w", padx=10, pady=5)
+
+        self.load_button = ctk.CTkButton(self.left_frame, text="Upload CSV", command=self.upload_csv)
+        self.load_button.pack(anchor="w", padx=10, pady=5)
+
+        self.filter_label = ctk.CTkLabel(self.left_frame, text="Choose and apply filter to columns", fg_color="#ffffff", font=("Arial", 15, "bold"))
+        self.filter_label.pack(anchor="w", padx=10, pady=5)
+
+        self.filter_var = ctk.StringVar()
+        self.filter_menu = ctk.CTkComboBox(self.left_frame, values=["Filter Options"], variable=self.filter_var, state="readonly", corner_radius=10)
+        self.filter_menu.set("Filter Options")
+        self.filter_menu.pack(anchor="w", padx=10, pady=5)
+
+        self.data_table_frame = ctk.CTkFrame(self.left_frame, fg_color="#ffffff", height=400)
+        self.data_table_frame.pack(fill=ctk.BOTH, expand=True, padx=10, pady=10)
+
+        self.data_table = ttk.Treeview(self.data_table_frame)
+        self.scroll_x = ttk.Scrollbar(self.data_table_frame, orient="horizontal", command=self.data_table.xview)
+        self.scroll_y = ttk.Scrollbar(self.data_table_frame, orient="vertical", command=self.data_table.yview)
+        self.data_table.configure(xscrollcommand=self.scroll_x.set, yscrollcommand=self.scroll_y.set)
+
+        self.data_table.grid(row=0, column=0, sticky="nsew")
+        self.scroll_y.grid(row=0, column=1, sticky="ns")
+        self.scroll_x.grid(row=1, column=0, sticky="ew")
+
+        self.data_table_frame.grid_rowconfigure(0, weight=1)
+        self.data_table_frame.grid_columnconfigure(0, weight=1)
+
+    def create_right_frame(self):
+        self.right_frame = ctk.CTkFrame(self.main_frame, fg_color="#ffffff", corner_radius=10, width=int(1200 * 0.45))
+        self.right_frame.pack(side=ctk.RIGHT, fill=ctk.BOTH, expand=False, padx=5, pady=5)
+        self.right_frame.pack_propagate(False)
+
+        summary_title = ctk.CTkLabel(self.right_frame, text="Dataset Summary", fg_color="#ffffff", font=("Arial", 18, "bold"))
+        summary_title.pack(anchor="w", padx=10, pady=5)
+
+        sections = [
+            "Overview", "Shape", "Missing Values", "Duplicates", 
+            "Data Types", "Stats", "Unique Values", "Critical Columns"
+        ]
+
+        for title in sections:
+            section_frame = ctk.CTkFrame(self.right_frame, fg_color="#f9f9f9", corner_radius=10)
+            section_frame.pack(fill='x', pady=5, padx=10)
+
+            label_title = ctk.CTkLabel(section_frame, text=title, font=("Arial", 14, "bold"), text_color="#1a73e8")
+            label_title.pack(anchor='w', padx=10, pady=(5, 0))
+
+            label_data = ctk.CTkLabel(section_frame, text="", font=("Arial", 12), wraplength=350, justify="left")
+            label_data.pack(anchor='w', padx=10, pady=(0, 5))
+
+            self.summary_labels[title] = label_data
+
+    def upload_csv(self):
+        file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
+        if file_path:
+            try:
+                self.df = pd.read_csv(file_path)
+                self.label_dataset_name.configure(text=file_path.split("/")[-1])
+                self.update_filter_options()
+                self.display_data_table()
+                self.show_eda()
+            except Exception as e:
+                messagebox.showerror("Error", f"Failed to load file: {e}")
+        else:
+            messagebox.showwarning("Warning", "No file selected")
+
+    def update_filter_options(self):
+        columns = list(self.df.columns)
+        self.filter_menu.configure(values=columns)
+        if columns:
+            self.filter_menu.set(columns[0])
+
+    def display_data_table(self):
+        self.data_table.delete(*self.data_table.get_children())
+        self.data_table["columns"] = list(self.df.columns)
+        self.data_table["show"] = "headings"
+
+        for col in self.df.columns:
+            self.data_table.heading(col, text=col)
+            self.data_table.column(col, width=100, anchor="center")
+
+        for _, row in self.df.iterrows():
+            self.data_table.insert("", "end", values=list(row))
+
+    def load_dataset(self):
+        self.upload_csv()
+
+    def show_eda(self):
+        if self.df is not None:
+            self.summary_labels["Overview"].configure(text="Dataset loaded successfully.")
+            self.summary_labels["Shape"].configure(text=str(self.df.shape))
+            self.summary_labels["Missing Values"].configure(text=str(self.df.isnull().sum()))
+            self.summary_labels["Duplicates"].configure(text=str(self.df.duplicated().sum()))
+            self.summary_labels["Data Types"].configure(text=str(self.df.dtypes))
+            self.summary_labels["Stats"].configure(text=str(self.df.describe(include='all')))
+            self.summary_labels["Unique Values"].configure(text=str(self.df.nunique()))
+            critical_cols = self.df.columns[self.df.isnull().mean() > 0.5].tolist()
+            self.summary_labels["Critical Columns"].configure(text=str(critical_cols) if critical_cols else "No critical columns")
+
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = Dataset(root)
+    root = ctk.CTk()
+    app = DatasetApp(root)
     root.mainloop()
