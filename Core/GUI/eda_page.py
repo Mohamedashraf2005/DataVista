@@ -69,12 +69,12 @@ class EdaPage:
         self.generate_chart_button = ctk.CTkButton(self.eda_right_frame, text="Generate Chart", command=self.generate_chart)
         self.generate_chart_button.pack(anchor="w", padx=10, pady=5)
 
-    def generate_insights(self):
-        if self.df is not None:
-            profile = ProfileReport(self.df, explorative=True, minimal=True)
-            insights = profile.get_description()
-            self.insights_text.delete("1.0", "end")
-            self.insights_text.insert("end", str(insights))
+    # def generate_insights(self):
+        # if self.df is not None:
+            # profile = ProfileReport(self.df, explorative=True, minimal=True)
+            # insights = profile.get_description()
+            # self.insights_text.delete("1.0", "end")
+            # self.insights_text.insert("end", str(insights))
 
     def generate_default_charts(self):
         for canvas in self.chart_canvases:
@@ -92,14 +92,14 @@ class EdaPage:
                 canvas.get_tk_widget().pack(fill="both", expand=True)
                 self.chart_canvases.append(canvas)
 
-            if len(num_cols) > 1:
-                fig, ax = plt.subplots(figsize=(3, 2))
-                sns.heatmap(self.df[num_cols].corr(), annot=True, cmap="coolwarm", ax=ax)
-                ax.set_title("Correlation Heatmap")
-                canvas = FigureCanvasTkAgg(fig, master=self.chart_frames[1])
-                canvas.draw()
-                canvas.get_tk_widget().pack(fill="both", expand=True)
-                self.chart_canvases.append(canvas)
+            # if len(num_cols) > 1:
+            #     fig, ax = plt.subplots(figsize=(3, 2))
+            #     sns.heatmap(self.df[num_cols].corr(), annot=True, cmap="coolwarm", ax=ax)
+            #     ax.set_title("Correlation Heatmap")
+            #     canvas = FigureCanvasTkAgg(fig, master=self.chart_frames[1])
+            #     canvas.draw()
+            #     canvas.get_tk_widget().pack(fill="both", expand=True)
+            #     self.chart_canvases.append(canvas)
 
             if len(num_cols) >= 2:
                 fig, ax = plt.subplots(figsize=(3, 2))
