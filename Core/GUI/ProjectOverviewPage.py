@@ -61,6 +61,6 @@ class ProjectOverviewPage:
         contact_title.pack(anchor='w', padx=10, pady=(20, 0))
 
         contact_desc = ctk.CTkLabel(self.right_frame, 
-                                    text="For further information or collaboration opportunities, please reach out to us via email at mohamedachrvf@gmail.com mohamedachrvf@gmail.com mohamedachrvf@gmail.com mohamedachrvf@gmail.com .",
+                                    text="For further information or collaboration opportunities, please reach out to us via email at mohamedachrvf@gmail.com\nmohamedachrvf@gmail.com\nmohamedachrvf@gmail.com\nmohamedachrvf@gmail.com\n .",
                                     font=("Arial", 12), wraplength=500, justify="left")
         contact_desc.pack(anchor='w', padx=10, pady=(5, 10))
