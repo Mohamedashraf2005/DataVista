@@ -3,6 +3,8 @@ from tkinter import filedialog, messagebox
 import pandas as pd
 from dataset_page import DatasetPage
 from eda_page import EdaPage
+from ProjectOverviewPage import ProjectOverviewPage
+from MLmodel import MLModelPage
 
 ctk.set_appearance_mode("light")
 ctk.set_default_color_theme("blue")
@@ -16,6 +18,7 @@ class mainApp:
 
         self.df = None
         self.current_page = None
+        self.dataset_page = None  # Store DatasetPage instance
 
         self.create_top_frame()
         self.create_main_frame()
@@ -31,10 +34,10 @@ class mainApp:
         self.btn_eda = ctk.CTkButton(self.top_frame, text="EDA", fg_color="#e8f0fe", text_color="#1a73e8", font=("Arial", 15), corner_radius=10, command=self.show_eda_page)
         self.btn_eda.pack(side=ctk.LEFT, padx=10, expand=True, fill=ctk.X)
 
-        self.btn_ml = ctk.CTkButton(self.top_frame, text="ML Model", fg_color="#e8f0fe", text_color="#1a73e8", font=("Arial", 15), corner_radius=10)
+        self.btn_ml = ctk.CTkButton(self.top_frame, text="ML Model", fg_color="#e8f0fe", text_color="#1a73e8", font=("Arial", 15), corner_radius=10, command=self.show_ml_model_page)
         self.btn_ml.pack(side=ctk.LEFT, padx=10, expand=True, fill=ctk.X)
 
-        self.btn_about = ctk.CTkButton(self.top_frame, text="About Project (optional)", fg_color="#e8f0fe", text_color="#1a73e8", font=("Arial", 15), corner_radius=10)
+        self.btn_about = ctk.CTkButton(self.top_frame, text="About Project", fg_color="#e8f0fe", text_color="#1a73e8", font=("Arial", 15), corner_radius=10, command=self.show_project_overview_page)
         self.btn_about.pack(side=ctk.LEFT, padx=10, expand=True, fill=ctk.X)
 
     def create_main_frame(self):
@@ -46,17 +49,52 @@ class mainApp:
         for widget in self.main_frame.winfo_children():
             widget.destroy()
 
+    def reset_button_styles(self):
+        self.btn_dataset.configure(fg_color="#e8f0fe", text_color="#1a73e8", font=("Arial", 15))
+        self.btn_eda.configure(fg_color="#e8f0fe", text_color="#1a73e8", font=("Arial", 15))
+        self.btn_ml.configure(fg_color="#e8f0fe", text_color="#1a73e8", font=("Arial", 15))
+        self.btn_about.configure(fg_color="#e8f0fe", text_color="#1a73e8", font=("Arial", 15))
+
     def show_dataset_page(self):
         self.clear_main_frame()
-        self.current_page = DatasetPage(self.main_frame, self)
-        self.current_page.create_ui()
+        self.reset_button_styles()
+        self.btn_dataset.configure(fg_color="#1a73e8", text_color="white", font=("Arial", 15, "bold"))
+        
+        # Reuse the existing DatasetPage instance if it exists, otherwise create a new one
+        if self.dataset_page is None:
+            self.dataset_page = DatasetPage(self.main_frame, self)
+            self.current_page = self.dataset_page
+            self.dataset_page.create_ui()
+        else:
+            self.current_page = self.dataset_page
+            self.dataset_page.create_ui()  # Recreate the UI in the cleared frame
+        
+        # If data exists, update the UI with the loaded data
+        if self.df is not None:
+            self.dataset_page.update_ui(self.df, "Previously Loaded Dataset")
 
     def show_eda_page(self):
         if self.df is None:
             messagebox.showwarning("Warning", "Please load a dataset first.")
             return
         self.clear_main_frame()
+        self.reset_button_styles()
+        self.btn_eda.configure(fg_color="#1a73e8", text_color="white", font=("Arial", 15, "bold"))
         self.current_page = EdaPage(self.main_frame, self)
+        self.current_page.create_ui()
+
+    def show_ml_model_page(self):
+        self.clear_main_frame()
+        self.reset_button_styles()
+        self.btn_ml.configure(fg_color="#1a73e8", text_color="white", font=("Arial", 15, "bold"))
+        self.current_page = MLModelPage(self.main_frame, self)
+        self.current_page.create_ui()
+
+    def show_project_overview_page(self):
+        self.clear_main_frame()
+        self.reset_button_styles()
+        self.btn_about.configure(fg_color="#1a73e8", text_color="white", font=("Arial", 15, "bold"))
+        self.current_page = ProjectOverviewPage(self.main_frame, self)
         self.current_page.create_ui()
 
     def upload_csv(self):

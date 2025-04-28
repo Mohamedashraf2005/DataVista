@@ -139,6 +139,18 @@ class EdaPage:
                 messagebox.showerror("Error", "Dataset must have at least one column.")
                 return
 
+            # Visualization - Add label and dropdown
+            label = ctk.CTkLabel(self.eda_right_frame, text="Select column for histogram:")
+            label.pack(pady=5)
+
+            self.column_dropdown = ctk.CTkComboBox(self.eda_right_frame, values=columns, state="readonly")
+            self.column_dropdown.pack(pady=5)
+
+            plot_button = ctk.CTkButton(self.eda_right_frame, text="Plot Histogram", command=self.plot_histogram)
+            plot_button.pack(pady=5)
+
+
+
             num_cols = self.df.select_dtypes(include=['float64', 'int64']).columns
             if len(num_cols) < 1:
                 messagebox.showerror("Error", "No numerical columns available for histogram.")
@@ -152,3 +164,23 @@ class EdaPage:
             canvas.draw()
             canvas.get_tk_widget().pack(fill="both", expand=True)
             self.chart_canvases.append(canvas)
+
+    def plot_histogram(self):
+        if self.df is not None:
+            column = self.column_dropdown.get()
+            if column in self.df.columns:
+                if pd.api.types.is_numeric_dtype(self.df[column]):
+                    plt.figure(figsize=(8, 5))  # Create a NEW figure
+                    sns.histplot(self.df[column], kde=True)
+                    plt.title(f"Histogram of {column}")
+                    plt.xlabel(column)
+                    plt.ylabel("Frequency")
+                    plt.grid(True)
+                    plt.tight_layout()
+                    plt.show()  # Open in a new window
+                else:
+                    messagebox.showerror("Error", f"Column '{column}' is not numeric and cannot be plotted.")
+            else:
+                messagebox.showerror("Error", "Column not found in dataset.")
+        else:
+            messagebox.showinfo("Info", "No dataset loaded.")
