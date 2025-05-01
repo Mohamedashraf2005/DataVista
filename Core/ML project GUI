@@ -87,10 +87,13 @@ class DashboardPage(tk.Frame):
         tk.Label(side_frame, text="📊 Options", font=("Helvetica", 14, "bold"), bg="#eaf4f4", fg="#333333").pack(pady=10)
 
         options = [
-            ("Show Histogram", self.show_hist),
-            ("Show Heatmap", self.show_heatmap),
-            ("Show Pairplot", self.show_pairplot),
+            ("Dataset summary, structure", self.show_structure),
+            ("My data portfolio", self.show_summary),
+            ("Show hist", self.show_hist),
+            ("Show heatmap", self.show_heatmap),
+            ("Show pairplot", self.show_pairplot),
             ("Show Barchart", self.show_barchart),
+            ("Generate Your own plot", self.custom_plot),
         ]
 
         for name, command in options:
@@ -100,6 +103,18 @@ class DashboardPage(tk.Frame):
 
         self.canvas = tk.Frame(self, bg="#ffffff")
         self.canvas.place(x=200, y=0, width=800, height=600)
+
+    def show_structure(self):
+        self.clear_canvas()
+        data = self.controller.data
+        structure = str(data.dtypes)
+        messagebox.showinfo("Dataset Structure", structure)
+
+    def show_summary(self):
+        self.clear_canvas()
+        data = self.controller.data
+        summary = str(data.describe())
+        messagebox.showinfo("Data Summary", summary)
 
     def show_hist(self):
         self.clear_canvas()
@@ -138,6 +153,10 @@ class DashboardPage(tk.Frame):
             plt.show()
         else:
             messagebox.showinfo("No Categories", "No categorical column found.")
+
+    def custom_plot(self):
+        self.clear_canvas()
+        messagebox.showinfo("Coming Soon", "🚧 Custom Plot feature under development.")
 
     def clear_canvas(self):
         for widget in self.canvas.winfo_children():
