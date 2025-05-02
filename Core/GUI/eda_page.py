@@ -18,16 +18,16 @@ class EdaPage:
         self.eda_frame = ctk.CTkFrame(self.parent, fg_color="#f0f4f8")
         self.eda_frame.pack(fill=ctk.BOTH, expand=True)
 
-        methods_label = ctk.CTkLabel(self.eda_frame, text="Methods used to handle data: Simple Imputer, KNN, Normalize Data, Encoding methods", font=("Arial", 12))
+        methods_label = ctk.CTkLabel(self.eda_frame, text="Methods used to handle data: Simple Imputer, KNN, Normalize Data, Encoding methods", font=("Arial", 12, "bold"))
         methods_label.pack(anchor="w", padx=300, pady=5)
 
-        self.eda_left_frame = ctk.CTkFrame(self.eda_frame, fg_color="#ffffff", corner_radius=10, width=int(1200 * 0.65))
-        self.eda_left_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=False, padx=5, pady=5)
-        self.eda_left_frame.pack_propagate(False)
+        # Left frame (responsive)
+        self.eda_left_frame = ctk.CTkFrame(self.eda_frame, fg_color="#ffffff", corner_radius=10)
+        self.eda_left_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True, padx=5, pady=5)
 
-        self.eda_right_frame = ctk.CTkFrame(self.eda_frame, fg_color="#ffffff", corner_radius=10, width=int(1200 * 0.35))
-        self.eda_right_frame.pack(side=ctk.RIGHT, fill=ctk.BOTH, expand=False, padx=5, pady=5)
-        self.eda_right_frame.pack_propagate(False)
+        # Right frame (responsive)
+        self.eda_right_frame = ctk.CTkFrame(self.eda_frame, fg_color="#ffffff", corner_radius=10)
+        self.eda_right_frame.pack(side=ctk.RIGHT, fill=ctk.BOTH, expand=True, padx=5, pady=5)
 
         self.create_left_frame()
         self.create_right_frame()
@@ -58,9 +58,13 @@ class EdaPage:
         insights_label = ctk.CTkLabel(self.eda_right_frame, text="Insights text\n(correlations ... alert from ydata Profiling)", font=("Arial", 15, "bold"))
         insights_label.pack(anchor="w", padx=30, pady=5)
 
-        self.insights_text = ctk.CTkTextbox(self.eda_right_frame, height=300, wrap="word")
+        # Make insights_text read-only
+        self.insights_text = ctk.CTkTextbox(self.eda_right_frame, height=300, state="disabled")
         self.insights_text.pack(fill="x", padx=10, pady=5)
+        # Enable temporarily to insert text, then disable again
+        self.insights_text.configure(state="normal")
         self.insights_text.insert("end", "Insights will be displayed here after generating the profile report.")
+        self.insights_text.configure(state="disabled")
 
         self.chart_dropdown_var = ctk.StringVar()
         self.chart_dropdown = ctk.CTkComboBox(self.eda_right_frame, values=["Make bar chart relation between two columns", "Make histogram for one column"], variable=self.chart_dropdown_var, state="readonly", corner_radius=10)
@@ -69,48 +73,14 @@ class EdaPage:
         self.generate_chart_button = ctk.CTkButton(self.eda_right_frame, text="Generate Chart", command=self.generate_chart)
         self.generate_chart_button.pack(anchor="w", padx=10, pady=5)
 
-    # def generate_insights(self):
-        # if self.df is not None:
-            # profile = ProfileReport(self.df, explorative=True, minimal=True)
-            # insights = profile.get_description()
-            # self.insights_text.delete("1.0", "end")
-            # self.insights_text.insert("end", str(insights))
-
-    def generate_default_charts(self):
-        for canvas in self.chart_canvases:
-            canvas.get_tk_widget().destroy()
-        self.chart_canvases = []
-
+    def generate_insights(self):
         if self.df is not None:
-            num_cols = self.df.select_dtypes(include=['float64', 'int64']).columns
-            if len(num_cols) > 0:
-                fig, ax = plt.subplots(figsize=(3, 2))
-                self.df[num_cols[0]].hist(ax=ax)
-                ax.set_title(f"Histogram of {num_cols[0]}")
-                canvas = FigureCanvasTkAgg(fig, master=self.chart_frames[0])
-                canvas.draw()
-                canvas.get_tk_widget().pack(fill="both", expand=True)
-                self.chart_canvases.append(canvas)
-
-            # if len(num_cols) > 1:
-            #     fig, ax = plt.subplots(figsize=(3, 2))
-            #     sns.heatmap(self.df[num_cols].corr(), annot=True, cmap="coolwarm", ax=ax)
-            #     ax.set_title("Correlation Heatmap")
-            #     canvas = FigureCanvasTkAgg(fig, master=self.chart_frames[1])
-            #     canvas.draw()
-            #     canvas.get_tk_widget().pack(fill="both", expand=True)
-            #     self.chart_canvases.append(canvas)
-
-            if len(num_cols) >= 2:
-                fig, ax = plt.subplots(figsize=(3, 2))
-                ax.scatter(self.df[num_cols[0]], self.df[num_cols[1]])
-                ax.set_xlabel(num_cols[0])
-                ax.set_ylabel(num_cols[1])
-                ax.set_title("Pair Plot")
-                canvas = FigureCanvasTkAgg(fig, master=self.chart_frames[2])
-                canvas.draw()
-                canvas.get_tk_widget().pack(fill="both", expand=True)
-                self.chart_canvases.append(canvas)
+            profile = ProfileReport(self.df, explorative=True, minimal=True)
+            insights = profile.get_description()
+            self.insights_text.configure(state="normal")  # Enable to update text
+            self.insights_text.delete("1.0", "end")
+            self.insights_text.insert("end", str(insights))
+            self.insights_text.configure(state="disabled")  # Disable after update
 
     def generate_chart(self):
         if self.df is None:
@@ -118,6 +88,10 @@ class EdaPage:
             return
 
         chart_type = self.chart_dropdown_var.get()
+        if self.current_chart_index >= len(self.chart_frames):
+            messagebox.showwarning("Warning", "No more chart frames available.")
+            self.current_chart_index = 0  # Reset to overwrite from the beginning
+
         if chart_type == "Make bar chart relation between two columns":
             columns = list(self.df.columns)
             if len(columns) < 2:
@@ -128,10 +102,11 @@ class EdaPage:
             fig, ax = plt.subplots(figsize=(3, 2))
             self.df.groupby(col1)[col2].mean().plot(kind="bar", ax=ax)
             ax.set_title(f"Bar Chart: {col1} vs {col2}")
-            canvas = FigureCanvasTkAgg(fig, master=self.chart_frames[3])
+            canvas = FigureCanvasTkAgg(fig, master=self.chart_frames[self.current_chart_index])
             canvas.draw()
             canvas.get_tk_widget().pack(fill="both", expand=True)
             self.chart_canvases.append(canvas)
+            self.current_chart_index += 1  # Move to next frame
 
         elif chart_type == "Make histogram for one column":
             columns = list(self.df.columns)
@@ -139,7 +114,12 @@ class EdaPage:
                 messagebox.showerror("Error", "Dataset must have at least one column.")
                 return
 
-            # Visualization - Add label and dropdown
+            # Clear previous histogram UI elements if they exist
+            if hasattr(self, 'histogram_ui_elements'):
+                for widget in self.histogram_ui_elements:
+                    widget.destroy()
+
+            # Create UI for histogram column selection
             label = ctk.CTkLabel(self.eda_right_frame, text="Select column for histogram:")
             label.pack(pady=5)
 
@@ -149,38 +129,32 @@ class EdaPage:
             plot_button = ctk.CTkButton(self.eda_right_frame, text="Plot Histogram", command=self.plot_histogram)
             plot_button.pack(pady=5)
 
-
-
-            num_cols = self.df.select_dtypes(include=['float64', 'int64']).columns
-            if len(num_cols) < 1:
-                messagebox.showerror("Error", "No numerical columns available for histogram.")
-                return
-
-            col = num_cols[0]
-            fig, ax = plt.subplots(figsize=(3, 2))
-            self.df[col].hist(ax=ax)
-            ax.set_title(f"Histogram of {col}")
-            canvas = FigureCanvasTkAgg(fig, master=self.chart_frames[4])
-            canvas.draw()
-            canvas.get_tk_widget().pack(fill="both", expand=True)
-            self.chart_canvases.append(canvas)
+            # Store UI elements to clear later
+            self.histogram_ui_elements = [label, self.column_dropdown, plot_button]
 
     def plot_histogram(self):
-        if self.df is not None:
-            column = self.column_dropdown.get()
-            if column in self.df.columns:
-                if pd.api.types.is_numeric_dtype(self.df[column]):
-                    plt.figure(figsize=(8, 5))  # Create a NEW figure
-                    sns.histplot(self.df[column], kde=True)
-                    plt.title(f"Histogram of {column}")
-                    plt.xlabel(column)
-                    plt.ylabel("Frequency")
-                    plt.grid(True)
-                    plt.tight_layout()
-                    plt.show()  # Open in a new window
-                else:
-                    messagebox.showerror("Error", f"Column '{column}' is not numeric and cannot be plotted.")
-            else:
-                messagebox.showerror("Error", "Column not found in dataset.")
-        else:
+        if self.df is None:
             messagebox.showinfo("Info", "No dataset loaded.")
+            return
+
+        column = self.column_dropdown.get()
+        if column in self.df.columns:
+            if pd.api.types.is_numeric_dtype(self.df[column]):
+                if self.current_chart_index >= len(self.chart_frames):
+                    messagebox.showwarning("Warning", "No more chart frames available.")
+                    self.current_chart_index = 0  # Reset to overwrite from the beginning
+
+                fig, ax = plt.subplots(figsize=(3, 2))
+                sns.histplot(self.df[column], kde=True, ax=ax)
+                ax.set_title(f"Histogram of {column}")
+                ax.set_xlabel(column)
+                ax.set_ylabel("Frequency")
+                canvas = FigureCanvasTkAgg(fig, master=self.chart_frames[self.current_chart_index])
+                canvas.draw()
+                canvas.get_tk_widget().pack(fill="both", expand=True)
+                self.chart_canvases.append(canvas)
+                self.current_chart_index += 1  # Move to next frame
+            else:
+                messagebox.showerror("Error", f"Column '{column}' is not numeric and cannot be plotted.")
+        else:
+            messagebox.showerror("Error", "Column not found in dataset.")
