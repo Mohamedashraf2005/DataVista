@@ -14,7 +14,7 @@ class mainApp:
         self.root = root
         self.root.title("DataAnalysis Interface")
         self.root.geometry("1200x640+250+100")
-        self.root.resizable(False, False)
+        # self.root.resizable(False, False)
 
         self.df = None
         self.current_page = None
@@ -80,14 +80,16 @@ class mainApp:
         self.clear_main_frame()
         self.reset_button_styles()
         self.btn_eda.configure(fg_color="#1a73e8", text_color="white", font=("Arial", 15, "bold"))
-        self.current_page = EdaPage(self.main_frame, self)
-        self.current_page.create_ui()
+        self.current_page = EdaPage(self.main_frame, self.df)  # Pass self.df instead of self
 
     def show_ml_model_page(self):
+        if self.df is None:
+            messagebox.showwarning("Warning", "Please load a dataset first.")
+            return
         self.clear_main_frame()
         self.reset_button_styles()
         self.btn_ml.configure(fg_color="#1a73e8", text_color="white", font=("Arial", 15, "bold"))
-        self.current_page = MLModelPage(self.main_frame, self)
+        self.current_page = MLModelPage(self.main_frame, self.df)  # Pass self.df instead of self
         self.current_page.create_ui()
 
     def show_project_overview_page(self):

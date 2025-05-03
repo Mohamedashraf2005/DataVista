@@ -51,26 +51,8 @@ class MLModelPage:
         self.tab_view = ctk.CTkTabview(self.lower_frame, fg_color="#ffffff", segmented_button_selected_color="#1a73e8", 
                                        segmented_button_selected_hover_color="#1565c0", corner_radius=12)
         self.tab_view.pack(fill=ctk.BOTH, expand=True, padx=5, pady=5)
-
-        # Tab 1: Confusion Matrix
-        self.confusion_tab = self.tab_view.add("Confusion Matrix")
-        confusion_title = ctk.CTkLabel(self.confusion_tab, text="CONFUSION MATRIX VISUALIZATION", 
-                                       font=("Arial", 16, "bold"), text_color="#1a73e8")
-        confusion_title.pack(anchor='center', pady=(10, 10))
-        confusion_placeholder = ctk.CTkLabel(self.confusion_tab, text="Placeholder for Confusion Matrix Plot", 
-                                             font=("Arial", 12), text_color="#333333")
-        confusion_placeholder.pack(anchor='center', pady=10)
-
-        # Tab 2: Key Features
-        self.features_tab = self.tab_view.add("Key Features")
-        features_title = ctk.CTkLabel(self.features_tab, text="Key Features Extracted from Training Data", 
-                                      font=("Arial", 16, "bold"), text_color="#1a73e8")
-        features_title.pack(anchor='center', pady=(10, 10))
-        features_placeholder = ctk.CTkLabel(self.features_tab, text="Placeholder for Feature Importance Chart", 
-                                            font=("Arial", 12), text_color="#333333")
-        features_placeholder.pack(anchor='center', pady=10)
-
-        # Tab 3: Train-Test Split vs K-Folds Comparison
+        
+         # Tab 1: Train-Test Split vs K-Folds Comparison
         self.comparison_tab = self.tab_view.add("Model Evaluation Comparison")
         comparison_title = ctk.CTkLabel(self.comparison_tab, text="Train-Test Split vs K-Folds Comparison", 
                                         font=("Arial", 16, "bold"), text_color="#1a73e8")
@@ -125,3 +107,23 @@ class MLModelPage:
                                     text="CONS:",
                                     font=("Arial", 12), wraplength=300, justify="left", text_color="#333333")
         k_folds_cons.pack(anchor='w', padx=10, pady=5)
+
+        # Tab 2: Confusion Matrix
+        self.confusion_tab = self.tab_view.add("Confusion Matrix")
+        confusion_title = ctk.CTkLabel(self.confusion_tab, text="CONFUSION MATRIX VISUALIZATION", 
+                                       font=("Arial", 16, "bold"), text_color="#1a73e8")
+        confusion_title.pack(anchor='center', pady=(10, 10))
+        confusion_placeholder = ctk.CTkLabel(self.confusion_tab, text="Placeholder for Confusion Matrix Plot", 
+                                             font=("Arial", 12), text_color="#333333")
+        confusion_placeholder.pack(anchor='center', pady=10)
+
+        # Tab 3: Key Features
+        self.features_tab = self.tab_view.add("Key Features")
+        features_title = ctk.CTkLabel(self.features_tab, text="Key Features Extracted from Training Data", 
+                                      font=("Arial", 16, "bold"), text_color="#1a73e8")
+        features_title.pack(anchor='center', pady=(10, 10))
+        features_placeholder = ctk.CTkLabel(self.features_tab, text="Placeholder for Feature Importance Chart", 
+                                            font=("Arial", 12), text_color="#333333")
+        features_placeholder.pack(anchor='center', pady=10)
+
+       
