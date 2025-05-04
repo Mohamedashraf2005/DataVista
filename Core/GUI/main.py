@@ -71,7 +71,7 @@ class mainApp:
         
         # If data exists, update the UI with the loaded data
         if self.df is not None:
-            self.dataset_page.update_ui(self.df, "Previously Loaded Dataset")
+            self.dataset_page.update_ui(self.df, "Patient data.csv")# Ashraf modified this
 
     def show_eda_page(self):
         if self.df is None:

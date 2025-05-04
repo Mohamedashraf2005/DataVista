@@ -18,6 +18,18 @@ class EdaPage:
             # r"Core\GUI\EDA_Plots\weightvsbmi_scatter.png"
             # Add more paths here if you have additional images
         ]
+         # Hardcoded list of image paths for Full Plot tabs
+        self.full_plot_image_paths = [
+            r"Core\EDA,ML\EDA_Plots\firstcountplot.png",
+            r"Core\EDA,ML\EDA_Plots\secondcountplot.png",
+            r"Core\EDA,ML\EDA_Plots\Distofcolumns.png",
+            r"Core\EDA,ML\EDA_Plots\IQR_drop.png",
+            r"Core\EDA,ML\EDA_Plots\StandardDev_drop.png",
+            r"Core\EDA,ML\EDA_Plots\zscore_drop.png",
+            r"Core\EDA,ML\EDA_Plots\boxplots.png",
+            r"Core\EDA,ML\EDA_Plots\Adv._boxplots.png",
+            r"Core\EDA,ML\EDA_Plots\BARsmokerstatus.png",
+        ]
         self.setup_ui()
 
     def setup_ui(self):
@@ -71,7 +83,7 @@ class EdaPage:
             ctk.CTkLabel(entry_frame, text=status, text_color="#ffffff", font=("Arial", 12, "italic")).pack(side="right", padx=10, pady=5)
 
         # Distributions Section
-        distribution_label = ctk.CTkLabel(profiling_content, text="Distributions", font=("Arial", 16, "bold"), text_color="#333333")
+        distribution_label = ctk.CTkLabel(profiling_content, text="Distributions", font=("Arial", 16, "bold"), text_color="#0c9430")
         distribution_label.pack(anchor="w", padx=10, pady=(20, 5))
 
         distributions = [
@@ -122,12 +134,27 @@ class EdaPage:
         grid_container.grid_rowconfigure((0, 1), weight=1)
         grid_container.grid_columnconfigure((0, 1, 2), weight=1)
 
-        # Some full screen plot tabs
-        for i in range(4):
+       # Full screen plot tabs
+        for i in range(9):
             full_tab = self.tab_view.add(f"Full Plot {i + 1}")
             full_frame = ctk.CTkFrame(full_tab, fg_color="#e8f0fe")
             full_frame.pack(fill="both", expand=True, padx=10, pady=10)
             self.chart_frames.append(full_frame)
+            # Add a label to hold the image
+            image_label = ctk.CTkLabel(full_frame, text="", image=None, fg_color="#e8f0fe")
+            image_label.place(relx=0.5, rely=0.5, anchor="center")
+            # Load and display image if path exists
+            if i < len(self.full_plot_image_paths):
+                try:
+                    image = Image.open(self.full_plot_image_paths[i])
+                    # Resize image to fit within a reasonable size (e.g., 600x400) while maintaining aspect ratio
+                    if i==6:
+                         image.thumbnail((1000, 650), Image.Resampling.LANCZOS)
+                    image.thumbnail((1000, 750), Image.Resampling.LANCZOS)
+                    ctk_image = ctk.CTkImage(light_image=image, dark_image=image, size=(image.width, image.height))
+                    image_label.configure(image=ctk_image)
+                except Exception as e:
+                    print(f"Error loading full plot image {self.full_plot_image_paths[i]}: {e}")
 
 
         # Image tab with grid layout and chart dropdown
