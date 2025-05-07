@@ -181,7 +181,7 @@ class EdaPage:
 
         # Chart type dropdown
         self.chart_dropdown_var = ctk.StringVar(value="Histogram")
-        self.chart_dropdown = ctk.CTkOptionMenu(image_right_frame, values=["Bar Chart", "Histogram"], variable=self.chart_dropdown_var, command=self.toggle_column_dropdown)
+        self.chart_dropdown = ctk.CTkOptionMenu(image_right_frame, values=["Bar Chart", "Histogram","Line Chart","Pie Chart"], variable=self.chart_dropdown_var, command=self.toggle_column_dropdown)
         self.chart_dropdown.pack(pady=(20, 5))
 
         # Column dropdown for histogram (visible by default)
@@ -194,6 +194,12 @@ class EdaPage:
         # Column dropdown for bar chart (hidden by default)
         self.bar_column_label = ctk.CTkLabel(image_right_frame, text="Select Column for Bar Chart")
         self.bar_column_menu = ctk.CTkOptionMenu(image_right_frame, values=column_values)
+        # Column dropdown for bar chart (hidden by default)
+        self.pie_column_label = ctk.CTkLabel(image_right_frame, text="Select Column for Bar Chart")
+        self.pie_column_menu = ctk.CTkOptionMenu(image_right_frame, values=column_values)
+        # Column dropdown for bar chart (hidden by default)
+        self.line_column_label = ctk.CTkLabel(image_right_frame, text="Select Column for Bar Chart")
+        self.line_column_menu = ctk.CTkOptionMenu(image_right_frame, values=column_values)
 
         # Generate chart button
         self.generate_chart_button = ctk.CTkButton(image_right_frame, text="Generate Chart",fg_color="#00b300", command=self.generate_chart)
@@ -204,17 +210,28 @@ class EdaPage:
         self.reset_plots_button.pack(pady=(10, 30))
 
     def toggle_column_dropdown(self, choice):
+    # Hide all dropdowns and labels initially
+        self.hist_column_label.pack_forget()
+        self.hist_column_menu.pack_forget()
+        self.bar_column_label.pack_forget()
+        self.bar_column_menu.pack_forget()
+        self.line_column_label.pack_forget()
+        self.line_column_menu.pack_forget()
+        self.pie_column_label.pack_forget()
+        self.pie_column_menu.pack_forget()
         # Show/hide the appropriate column dropdown based on chart type
-        if choice == "Bar Chart":
-            self.hist_column_label.pack_forget()
-            self.hist_column_menu.pack_forget()
-            self.bar_column_label.pack(pady=(5, 5))
-            self.bar_column_menu.pack(pady=(0, 10))
-        else:  # Histogram
-            self.bar_column_label.pack_forget()
-            self.bar_column_menu.pack_forget()
+        if choice == "Histogram":
             self.hist_column_label.pack(pady=(5, 5))
             self.hist_column_menu.pack(pady=(0, 10))
+        elif choice == "Bar Chart":
+                self.bar_column_label.pack(pady=(5, 5))
+                self.bar_column_menu.pack(pady=(0, 10))
+        elif choice == "Line Chart":
+                self.line_column_label.pack(pady=(5, 5))
+                self.line_column_menu.pack(pady=(0, 10))
+        elif choice == "Pie Chart":
+                self.pie_column_label.pack(pady=(5, 5))
+                self.pie_column_menu.pack(pady=(0, 10))
 
     def generate_chart(self):
         chart_type = self.chart_dropdown_var.get()
@@ -222,7 +239,12 @@ class EdaPage:
             self.plot_image_histogram()
         elif chart_type == "Bar Chart":
             self.plot_image_bar_chart()
-
+        elif chart_type == "Line Chart":
+            self.plot_image_line_plot()
+        elif chart_type == "Pie Chart":
+            self.plot_image_pie_chart()
+# plot_image_line_plot
+# plot_image_pie_chart
     def plot_image_histogram(self):
         column = self.hist_column_menu.get()
         if column not in self.data.columns:
@@ -233,6 +255,7 @@ class EdaPage:
         plt.tight_layout()  # Ensure layout fits within figure
         self.display_image_plot(fig)
 
+
     def plot_image_bar_chart(self):
         column = self.bar_column_menu.get()
         if column not in self.data.columns:
@@ -240,6 +263,28 @@ class EdaPage:
         fig, ax = plt.subplots(figsize=(4, 3))  # Smaller figure size
         self.data[column].value_counts().plot(kind='bar', ax=ax, color='orange', edgecolor='black')
         ax.set_title(f'Bar Chart of {column}', fontsize=10)
+        plt.tight_layout()  # Ensure layout fits within figure
+        self.display_image_plot(fig)
+
+    def plot_image_line_plot(self):
+        column = self.line_column_menu.get()
+        if column not in self.data.columns:
+            return
+        fig, ax = plt.subplots(figsize=(4, 3))  # Smaller figure size
+        ax.plot(self.data.index, self.data[column], color='purple', marker='o')
+        ax.set_title(f'Line Plot of {column}', fontsize=10)
+        ax.set_xlabel('Index', fontsize=8)
+        ax.set_ylabel(column, fontsize=8)
+        plt.tight_layout()  # Ensure layout fits within figure
+        self.display_image_plot(fig)
+
+    def plot_image_pie_chart(self):
+        column = self.pie_column_menu.get()
+        if column not in self.data.columns:
+            return
+        fig, ax = plt.subplots(figsize=(4, 3))  # Smaller figure size
+        self.data[column].value_counts().plot(kind='pie', ax=ax, colors=['lightcoral', 'lightblue', 'lightgreen', 'orange'], autopct='%1.1f%%', startangle=90)
+        ax.set_title(f'Pie Chart of {column}', fontsize=10)
         plt.tight_layout()  # Ensure layout fits within figure
         self.display_image_plot(fig)
 
