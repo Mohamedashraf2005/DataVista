@@ -1,6 +1,7 @@
 import customtkinter as ctk
 from tkinter import messagebox
 import uuid
+from PIL import Image, ImageTk
 
 class MLModelPage:
     def __init__(self, parent, app):
@@ -23,15 +24,18 @@ class MLModelPage:
                                    font=("Arial", 18, "bold"), text_color="#1a73e8")
         model_title.pack(anchor='w', padx=15, pady=(15, 5))
 
-        summary_label = ctk.CTkLabel(self.left_frame, text="SUMMARY: Comprehensive model architecture and parameters", 
+        summary_label = ctk.CTkLabel(self.left_frame, text="SUMMARY: This model applies the Random Forest Classifier to " \
+        "predict whether a patient has diabetes based on some clinical features and this model is used  improve prediction accuracy and control overfitting", 
                                      font=("Arial", 13), wraplength=500, justify="left", text_color="#333333")
         summary_label.pack(anchor='w', padx=15, pady=(5, 5))
 
-        name_label = ctk.CTkLabel(self.left_frame, text="MODEL NAME: Gradient Boosting Classifier", 
+        name_label = ctk.CTkLabel(self.left_frame, text="MODEL NAME: Random Forest Classifier", 
                                   font=("Arial", 13), wraplength=500, justify="left", text_color="#333333")
         name_label.pack(anchor='w', padx=15, pady=(5, 5))
 
-        rationale_label = ctk.CTkLabel(self.left_frame, text="SELECTION RATIONALE: High accuracy and robustness", 
+        rationale_label = ctk.CTkLabel(self.left_frame, text="SELECTION RATIONALE: Chosen for its high accuracy, robustness to outliers and missing values,"
+        " and strong performance in handling imbalanced datasets." \
+        " Random Forest also helps identify feature importance for better clinical interpretability", 
                                        font=("Arial", 13), wraplength=500, justify="left", text_color="#333333")
         rationale_label.pack(anchor='w', padx=15, pady=(5, 15))
 
@@ -71,17 +75,20 @@ class MLModelPage:
         train_test_title.pack(anchor='w', padx=10, pady=(10, 5))
 
         train_test_desc = ctk.CTkLabel(train_test_frame, 
-                                       text="DESCRIPTION:",
+                                       text="DESCRIPTION: A simple technique to divide the dataset into two parts—typically" \
+                                       " a training set 20%' and a test set 80% , random state 42 to evaluate model performance",
                                        font=("Arial", 12), wraplength=300, justify="left", text_color="#333333")
         train_test_desc.pack(anchor='w', padx=10, pady=5)
 
         train_test_pros = ctk.CTkLabel(train_test_frame, 
-                                       text="PROS:",
+                                       text="PROS: fast and easy to implement \n" \
+                                       "Useful for quick model testing and prototyping",
                                        font=("Arial", 12), wraplength=300, justify="left", text_color="#333333")
         train_test_pros.pack(anchor='w', padx=10, pady=5)
 
         train_test_cons = ctk.CTkLabel(train_test_frame, 
-                                       text="CONS:",
+                                       text="CONS: Performance can vary depending on the random split \n" \
+                                       "Risk of overfitting or underfitting if the dataset is small or unbalanced",
                                        font=("Arial", 12), wraplength=300, justify="left", text_color="#333333")
         train_test_cons.pack(anchor='w', padx=10, pady=5)
 
@@ -94,36 +101,78 @@ class MLModelPage:
         k_folds_title.pack(anchor='w', padx=10, pady=(10, 5))
 
         k_folds_desc = ctk.CTkLabel(k_folds_frame, 
-                                    text="DESCRIPTION:",
+                                    text="DESCRIPTION: The dataset is divided into K=5 equal parts," \
+                                    " The model is trained on K-1 folds and tested on the remaining fold, repeated 5 times to ensure robustness",
                                     font=("Arial", 12), wraplength=300, justify="left", text_color="#333333")
         k_folds_desc.pack(anchor='w', padx=10, pady=5)
 
         k_folds_pros = ctk.CTkLabel(k_folds_frame, 
-                                    text="PROS:",
+                                    text="PROS:More reliable estimate of model performance\n" \
+                                    "Reduces variance caused by a single train/test split\n" \
+                                    "Useful for hyperparameter tuning ",
                                     font=("Arial", 12), wraplength=300, justify="left", text_color="#333333")
         k_folds_pros.pack(anchor='w', padx=10, pady=5)
 
         k_folds_cons = ctk.CTkLabel(k_folds_frame, 
-                                    text="CONS:",
+                                    text="CONS:Computationally more expensive\n" \
+                                    "Slower, especially with large datasets or complex models",
                                     font=("Arial", 12), wraplength=300, justify="left", text_color="#333333")
         k_folds_cons.pack(anchor='w', padx=10, pady=5)
 
         # Tab 2: Confusion Matrix
+        
+
         self.confusion_tab = self.tab_view.add("Confusion Matrix")
+
         confusion_title = ctk.CTkLabel(self.confusion_tab, text="CONFUSION MATRIX VISUALIZATION", 
-                                       font=("Arial", 16, "bold"), text_color="#1a73e8")
+                               font=("Arial", 16, "bold"), text_color="#1a73e8")
         confusion_title.pack(anchor='center', pady=(10, 10))
-        confusion_placeholder = ctk.CTkLabel(self.confusion_tab, text="Placeholder for Confusion Matrix Plot", 
-                                             font=("Arial", 12), text_color="#333333")
-        confusion_placeholder.pack(anchor='center', pady=10)
+
+        confusion_frame = ctk.CTkFrame(self.confusion_tab, fg_color="#f0f4f8")
+        confusion_frame.pack(fill=ctk.BOTH, expand=True, padx=10, pady=10)
+
+        left_confusion_frame = ctk.CTkFrame(confusion_frame, fg_color="#ffffff", corner_radius=8, border_width=1, border_color="#e0e0e0")
+        left_confusion_frame.pack(side=ctk.LEFT, fill=ctk.BOTH, expand=True, padx=(0, 5))
+
+        left_confusion_title = ctk.CTkLabel(left_confusion_frame, text="Confusion Matrix train-test split", 
+                                    font=("Arial", 14, "bold"), text_color="#1a73e8")
+        left_confusion_title.pack(anchor='center', pady=(10, 5))
+
+    
+        matrix1_image = Image.open("Core/EDA,ML/EDA_Plots/cm_train.png")  
+        matrix1_image = matrix1_image.resize((350, 350))  
+        matrix1_photo = ImageTk.PhotoImage(matrix1_image)
+        matrix1_label = ctk.CTkLabel(left_confusion_frame, image=matrix1_photo, text="")
+        matrix1_label.image = matrix1_photo  
+        matrix1_label.pack(anchor='center', pady=10)
+
+       
+        right_confusion_frame = ctk.CTkFrame(confusion_frame, fg_color="#ffffff", corner_radius=8, border_width=1, border_color="#e0e0e0")
+        right_confusion_frame.pack(side=ctk.RIGHT, fill=ctk.BOTH, expand=True, padx=(5, 0))
+
+        right_confusion_title = ctk.CTkLabel(right_confusion_frame, text="Confusion Matrix k-folds", 
+                                     font=("Arial", 14, "bold"), text_color="#1a73e8")
+        right_confusion_title.pack(anchor='center', pady=(10, 5))
+
+        
+        matrix2_image = Image.open("Core/EDA,ML/EDA_Plots/cm_k.png")  
+        matrix2_image = matrix2_image.resize((350, 350))  
+        matrix2_photo = ImageTk.PhotoImage(matrix2_image)
+        matrix2_label = ctk.CTkLabel(right_confusion_frame, image=matrix2_photo, text="")
+        matrix2_label.image = matrix2_photo  
+        matrix2_label.pack(anchor='center', pady=10)
+        
 
         # Tab 3: Key Features
         self.features_tab = self.tab_view.add("Key Features")
         features_title = ctk.CTkLabel(self.features_tab, text="Key Features Extracted from Training Data", 
                                       font=("Arial", 16, "bold"), text_color="#1a73e8")
         features_title.pack(anchor='center', pady=(10, 10))
-        features_placeholder = ctk.CTkLabel(self.features_tab, text="Placeholder for Feature Importance Chart", 
-                                            font=("Arial", 12), text_color="#333333")
-        features_placeholder.pack(anchor='center', pady=10)
+        key_features_image = Image.open("Core/EDA,ML/EDA_Plots/key_features.png")  
+        key_features_image = key_features_image.resize((700, 600))  
+        key_features_photo = ImageTk.PhotoImage(key_features_image)
+        key_features_label = ctk.CTkLabel(self.features_tab, image=key_features_photo, text="")
+        key_features_label.image = key_features_photo  
+        key_features_label.pack(anchor='center', pady=10)
 
        

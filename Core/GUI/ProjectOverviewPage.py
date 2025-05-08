@@ -81,9 +81,9 @@ class ProjectOverviewPage:
 
         contributors = [
             ("Mohamed Ashraf", "EDA, ML modeling"),
-            ("Eman Hekal", "GUI design, visualizations"),
+            ("Eman Hekal", "GUI design, Visualizations"),
             ("Ali Fathy", "GUI, Data preprocessing"),
-            ("Mariam Ahmed", "ML modeling"),
+            ("Mariam Ahmed", "ML modeling, Visualizations"),
             ("Mohammed Ahmed", "EDA, ML evaluation"),
             ("Youssef Ahmed", "EDA"),
             ("Kareem Mousa", "Data preprocessing")
