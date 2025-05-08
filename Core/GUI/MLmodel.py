@@ -169,7 +169,7 @@ class MLModelPage:
                                       font=("Arial", 16, "bold"), text_color="#1a73e8")
         features_title.pack(anchor='center', pady=(10, 10))
         key_features_image = Image.open("Core/EDA,ML/EDA_Plots/key_features.png")  
-        key_features_image = key_features_image.resize((700, 600))  
+        key_features_image = key_features_image.resize((700, 500))  
         key_features_photo = ImageTk.PhotoImage(key_features_image)
         key_features_label = ctk.CTkLabel(self.features_tab, image=key_features_photo, text="")
         key_features_label.image = key_features_photo  
