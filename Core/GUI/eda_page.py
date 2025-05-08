@@ -23,12 +23,15 @@ class EdaPage:
             r"Core\EDA,ML\EDA_Plots\firstcountplot.png",
             r"Core\EDA,ML\EDA_Plots\secondcountplot.png",
             r"Core\EDA,ML\EDA_Plots\Distofcolumns.png",
+            r"Core\EDA,ML\EDA_Plots\Pairplot.png",
+            r"Core\EDA,ML\EDA_Plots\BARsmokerstatus.png",
+            r"Core\EDA,ML\EDA_Plots\weightvsbmi_scatterplot.png",
             r"Core\EDA,ML\EDA_Plots\IQR_drop.png",
             r"Core\EDA,ML\EDA_Plots\StandardDev_drop.png",
             r"Core\EDA,ML\EDA_Plots\zscore_drop.png",
+            r"Core\EDA,ML\EDA_Plots\DBsacn2d.png",
             r"Core\EDA,ML\EDA_Plots\boxplots.png",
             r"Core\EDA,ML\EDA_Plots\Adv._boxplots.png",
-            r"Core\EDA,ML\EDA_Plots\BARsmokerstatus.png",
         ]
         self.setup_ui()
 
@@ -97,45 +100,45 @@ class EdaPage:
             ctk.CTkLabel(entry_frame, text=text, text_color="#333333", font=("Arial", 12), wraplength=600).pack(side="left", padx=10, pady=5)
             ctk.CTkLabel(entry_frame, text=status, text_color="#333333", font=("Arial", 12, "italic")).pack(side="right", padx=10, pady=5)
 
-        # First tab with 6 grid chart slots
-        self.tab1 = self.tab_view.add("Grid Charts")
-        grid_frame = ctk.CTkFrame(self.tab1)
-        grid_frame.pack(fill="both", expand=True, padx=10, pady=10)
+        # # First tab with 6 grid chart slots
+        # self.tab1 = self.tab_view.add("Grid Charts")
+        # grid_frame = ctk.CTkFrame(self.tab1)
+        # grid_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-        # Grid for chart slots
-        grid_container = ctk.CTkFrame(grid_frame)
-        grid_container.pack(fill="both", expand=True)
+        # # Grid for chart slots
+        # grid_container = ctk.CTkFrame(grid_frame)
+        # grid_container.pack(fill="both", expand=True)
 
-        for i in range(6):
-            chart_frame = ctk.CTkFrame(grid_container, fg_color="#e8f0fe", corner_radius=10, width=200, height=200)
-            row, col = divmod(i, 3)
-            chart_frame.grid(row=row, column=col, padx=5, pady=5, sticky="nsew")
-            self.chart_frames.append(chart_frame)
-            # Add a label to hold the image with centered alignment
-            image_label = ctk.CTkLabel(chart_frame, text="", image=None, fg_color="#e8f0fe")
-            image_label.place(relx=0.5, rely=0.5, anchor="center")  # Center the label
-            self.grid_image_labels.append(image_label)
-            # Load and display image if path exists
-            if i < len(self.image_paths):
-                try:
-                    image = Image.open(self.image_paths[i])
-                    # Calculate new size to fit within 200x200 while maintaining aspect ratio
-                    image.thumbnail((200, 200), Image.Resampling.LANCZOS)
-                    # Create a new image with the target size and paste the resized image
-                    new_image = Image.new("RGBA", (200, 200), (0, 0, 0, 0))
-                    paste_x = (200 - image.width) // 2
-                    paste_y = (200 - image.height) // 2
-                    new_image.paste(image, (paste_x, paste_y))
-                    ctk_image = ctk.CTkImage(light_image=new_image, dark_image=new_image, size=(200, 200))
-                    image_label.configure(image=ctk_image)
-                except Exception as e:
-                    print(f"Error loading image {self.image_paths[i]}: {e}")
+        # for i in range(6):
+        #     chart_frame = ctk.CTkFrame(grid_container, fg_color="#e8f0fe", corner_radius=10, width=200, height=200)
+        #     row, col = divmod(i, 3)
+        #     chart_frame.grid(row=row, column=col, padx=5, pady=5, sticky="nsew")
+        #     self.chart_frames.append(chart_frame)
+        #     # Add a label to hold the image with centered alignment
+        #     image_label = ctk.CTkLabel(chart_frame, text="", image=None, fg_color="#e8f0fe")
+        #     image_label.place(relx=0.5, rely=0.5, anchor="center")  # Center the label
+        #     self.grid_image_labels.append(image_label)
+        #     # Load and display image if path exists
+        #     if i < len(self.image_paths):
+        #         try:
+        #             image = Image.open(self.image_paths[i])
+        #             # Calculate new size to fit within 200x200 while maintaining aspect ratio
+        #             image.thumbnail((200, 200), Image.Resampling.LANCZOS)
+        #             # Create a new image with the target size and paste the resized image
+        #             new_image = Image.new("RGBA", (200, 200), (0, 0, 0, 0))
+        #             paste_x = (200 - image.width) // 2
+        #             paste_y = (200 - image.height) // 2
+        #             new_image.paste(image, (paste_x, paste_y))
+        #             ctk_image = ctk.CTkImage(light_image=new_image, dark_image=new_image, size=(200, 200))
+        #             image_label.configure(image=ctk_image)
+        #         except Exception as e:
+        #             print(f"Error loading image {self.image_paths[i]}: {e}")
 
-        grid_container.grid_rowconfigure((0, 1), weight=1)
-        grid_container.grid_columnconfigure((0, 1, 2), weight=1)
+        # grid_container.grid_rowconfigure((0, 1), weight=1)
+        # grid_container.grid_columnconfigure((0, 1, 2), weight=1)
 
        # Full screen plot tabs
-        for i in range(9):
+        for i in range(12):
             full_tab = self.tab_view.add(f"Full Plot {i + 1}")
             full_frame = ctk.CTkFrame(full_tab, fg_color="#e8f0fe")
             full_frame.pack(fill="both", expand=True, padx=10, pady=10)
@@ -148,7 +151,7 @@ class EdaPage:
                 try:
                     image = Image.open(self.full_plot_image_paths[i])
                     # Resize image to fit within a reasonable size (e.g., 600x400) while maintaining aspect ratio
-                    if i==6:
+                    if i==10:
                          image.thumbnail((1000, 650), Image.Resampling.LANCZOS)
                     image.thumbnail((1000, 750), Image.Resampling.LANCZOS)
                     ctk_image = ctk.CTkImage(light_image=image, dark_image=image, size=(image.width, image.height))
