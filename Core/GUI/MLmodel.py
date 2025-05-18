@@ -33,19 +33,57 @@ class MLModelPage:
                                   font=("Arial", 13), wraplength=500, justify="left", text_color="#333333")
         name_label.pack(anchor='w', padx=15, pady=(5, 5))
 
-        rationale_label = ctk.CTkLabel(self.left_frame, text="SELECTION RATIONALE: Chosen for its high accuracy, robustness to outliers and missing values,"
+        rationale_label = ctk.CTkLabel(self.left_frame, text="SELECTION RATIONALE: Chosen for its high accuracy, robustness to outliers and missing values," \
         " and strong performance in handling imbalanced datasets." \
         " Random Forest also helps identify feature importance for better clinical interpretability", 
                                        font=("Arial", 13), wraplength=500, justify="left", text_color="#333333")
         rationale_label.pack(anchor='w', padx=15, pady=(5, 15))
 
-        # Right Column: Interactive Prediction Interface (Placeholder)
+        # Right Column: Detailed Comparison
         self.right_frame = ctk.CTkFrame(self.upper_frame, fg_color="#e8f0fe", corner_radius=12, border_width=1, border_color="#e0e0e0")
         self.right_frame.pack(side=ctk.RIGHT, fill=ctk.BOTH, expand=True)
 
-        prediction_title = ctk.CTkLabel(self.right_frame, text="Interactive Prediction Interface", 
+        comparison_title = ctk.CTkLabel(self.right_frame, text="Model Accuracy Comparison", 
                                         font=("Arial", 18, "bold"), text_color="#1a73e8")
-        prediction_title.pack(anchor='center', pady=(15, 15))
+        comparison_title.pack(anchor='center', pady=(15, 15))
+
+        # Train-Test Split Metrics
+        train_test_title = ctk.CTkLabel(self.right_frame, text="Train-Test Split Metrics", 
+                                        font=("Arial", 14, "bold"), text_color="#1a73e8")
+        train_test_title.pack(anchor='w', padx=10, pady=(5, 5))
+
+        train_test_accuracy = ctk.CTkLabel(self.right_frame, 
+                                          text="Accuracy: 83.50 %", 
+                                          font=("Arial", 15), wraplength=300, justify="left", text_color="#333333")
+        train_test_accuracy.pack(anchor='w', padx=10, pady=(5, 5))
+
+        train_test_report = ctk.CTkLabel(self.right_frame, 
+                                        text="Metrics:\n" \
+                                             "\t-Train Size: 80 %\n" \
+                                             "\t-Test Size: 20 %\n" \
+                                             ,
+                                        font=("Arial", 15), wraplength=300, justify="left", text_color="#333333")
+        train_test_report.pack(anchor='w', padx=10, pady=(5, 5))
+
+        # K-Folds Metrics
+        k_folds_title = ctk.CTkLabel(self.right_frame, text="K-Folds Cross-Validation Metrics(5 Folds)", 
+                                     font=("Arial", 14, "bold"), text_color="#1a73e8")
+        k_folds_title.pack(anchor='w', padx=10, pady=(5, 5))
+
+        k_folds_accuracy = ctk.CTkLabel(self.right_frame, 
+                                        text="Fold 5 Accuracy: 84.62 %", 
+                                        font=("Arial", 15), wraplength=300, justify="left", text_color="#333333")
+        k_folds_accuracy.pack(anchor='w', padx=10, pady=(5, 5))
+
+        # k_folds_report = ctk.CTkLabel(self.right_frame, 
+        #                              text="Classification Report:\n" \
+        #                                   "Class 0: Precision: 0.86, Recall: 0.98, F1-Score: 0.92, Support: 835\n" \
+        #                                   "Class 2: Precision: 0.31, Recall: 0.06, F1-Score: 0.10, Support: 140\n" \
+        #                                   "Overall Accuracy: 0.85, Total Support: 975\n" \
+        #                                   "Macro Avg: Precision: 0.58, Recall: 0.52, F1-Score: 0.51\n" \
+        #                                   "Weighted Avg: Precision: 0.78, Recall: 0.85, F1-Score: 0.80",
+        #                              font=("Arial", 12), wraplength=300, justify="left", text_color="#333333")
+        # k_folds_report.pack(anchor='w', padx=10, pady=(5, 5))
 
         # Lower Frame: Tabbed Interface for Visualizations and Comparisons
         self.lower_frame = ctk.CTkFrame(self.ml_frame, fg_color="#f0f4f8")
@@ -120,8 +158,6 @@ class MLModelPage:
         k_folds_cons.pack(anchor='w', padx=10, pady=5)
 
         # Tab 2: Confusion Matrix
-        
-
         self.confusion_tab = self.tab_view.add("Confusion Matrix")
 
         confusion_title = ctk.CTkLabel(self.confusion_tab, text="CONFUSION MATRIX VISUALIZATION", 
@@ -162,17 +198,14 @@ class MLModelPage:
         matrix2_label.image = matrix2_photo  
         matrix2_label.pack(anchor='center', pady=10)
         
-
         # Tab 3: Key Features
         self.features_tab = self.tab_view.add("Key Features")
         features_title = ctk.CTkLabel(self.features_tab, text="Key Features Extracted from Training Data", 
                                       font=("Arial", 16, "bold"), text_color="#1a73e8")
         features_title.pack(anchor='center', pady=(10, 10))
         key_features_image = Image.open("Core/EDA,ML/EDA_Plots/key_features.png")  
-        key_features_image = key_features_image.resize((700, 500))  
+        key_features_image = key_features_image.resize((700, 450))  
         key_features_photo = ImageTk.PhotoImage(key_features_image)
         key_features_label = ctk.CTkLabel(self.features_tab, image=key_features_photo, text="")
         key_features_label.image = key_features_photo  
         key_features_label.pack(anchor='center', pady=10)
-
-       
